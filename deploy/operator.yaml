@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: poc-rollout-operator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: poc-rollout-operator
+  template:
+    metadata:
+      labels:
+        name: poc-rollout-operator
+    spec:
+      serviceAccountName: poc-rollout-operator
+      containers:
+        - name: poc-rollout-operator
+          # Replace this with the built image name
+          image: REPLACE_IMAGE
+          ports:
+          - containerPort: 60000
+            name: metrics
+          command:
+          - poc-rollout-operator
+          imagePullPolicy: Always
+          env:
+            - name: WATCH_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: OPERATOR_NAME
+              value: "poc-rollout-operator"
